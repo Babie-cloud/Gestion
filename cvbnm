@@ -1,0 +1,163 @@
+<tr>
+     
+                <td><label for="Service">Choisissez un service</label></td>
+                <td><select id="Service" name="Service" ></td>
+                <option value="lavage">Lavage</option>
+                <option value="plissage">Plissage</option>
+                <option value="nettoyage a sec">Nettoyage a sec</option>
+                <option value="repassage">Repassage</option></select>
+                <fieldset>
+                <legend>Options supplementaires : </legend>
+                <label><input type="checkbox" name="option_eco" value="eco">Service ecologique</label>
+                </fieldset>
+            </tr>
+
+
+
+
+
+            <?php
+            include "connection.php";
+            ?>  
+            
+            
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Liste des Victimes - Application de Gestion des Accidents Routiers</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                        text-align: center;
+                        background-color: #f1f1f1;
+                        color: #333;
+                    }
+                    h1 {
+                        color: #333;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                    }
+                    th, td {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                    }
+                    th {
+                        background-color: #f9f9f9;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                    tr:hover {
+                        background-color: #f1f1f1;
+                    }
+                    form {
+                        display: none;
+                        margin-top: 20px;
+                        padding: 20px;
+                        background-color: #fff;
+                        border-radius: 5px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        max-width: 600px;
+                        margin: 0 auto;
+                    }
+                    label {
+                        display: block;
+                        margin-top: 10px;
+                    }
+                    input, select {
+                        width: 100%;
+                        padding: 10px;
+                        margin-top: 5px;
+                        box-sizing: border-box;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                    }
+                    button {
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: #fff;
+                        border: none;
+                        border-radius: 5px;
+                        margin-top: 10px;
+                        cursor: pointer;
+                    }
+                    button:hover {
+                        background-color: #0056b3;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Liste des Victimes</h1>
+                
+                <form id="victimeForm">
+                    <label for="nom">Nom :</label>
+                    <input type="text" id="nom" name="nom" required>
+                    
+                    <label for="prenom">Prénom :</label>
+                    <input type="text" id="prenom" name="prenom" required>
+                    
+                    <label for="age">Âge :</label>
+                    <input type="number" id="age" name="age" required>
+                    
+                    <label for="sexe">Sexe :</label>
+                    <select id="sexe" name="sexe">
+                        <option value="homme">Homme</option>
+                        <option value="femme">Femme</option>
+                    </select>
+                    
+                </form>
+                <?php
+                $affichagevictime=$bdd->query("select * from victime");//selection de tous les donnees dans la bd
+                ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Âge</th>
+                            <th>Sexe</th>
+                        </tr>
+                    </thead>
+                    <?php
+                        while($recupdata = $affichagevictime->fetch()){
+                            //recuperation des data dans la bd dans un tableau.
+                            ?>
+                            <tbody>
+                        <tr>
+                            <td><?php echo $recupdata['nom']; ?></td>
+                            <td><?php echo $recupdata['prenom']; ?></td>
+                            <td><?php echo $recupdata['age']; ?></td>
+                            <td><?php echo $recupdata['sexe']; ?></td>
+                            <td><a href="?delete=<?php echo $recupdata['id_vict']; ?>" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce victime ?');">supprimer</a></td>
+                            <td><a href="#" class="btn btn-edit">modifier</a></td>
+                        </tr>
+                        <!-- Ajoutez d'autres lignes pour plus de témoins -->
+                    </tbody>
+                    <?php } ?>
+                </table>
+            
+                
+            <?php 
+                if (isset($_GET['delete'])) {
+                  $id = $_GET['delete'];
+                  try {
+                      $stmt = $bdd->prepare("DELETE FROM victime WHERE id_vict = ?");
+                      $stmt->execute([$id]);
+                      $message = "victime supprimé avec succès !";
+                      header("location:liste_victimes.php");
+                  } catch (PDOException $e) {
+                      $message = "Erreur lors de la suppression : " . $e->getMessage();
+                  }
+            }
+            
+            ?>
+            
+            </body>
+            </html>
